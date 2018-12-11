@@ -76,6 +76,8 @@ public class MyServlet extends HttpServlet {
                 }
             }Calendar c = new GregorianCalendar();
             History history = new History(giveBook, takeReader, c.getTime());
+            request.setAttribute("history", history);
+            request.getRequestDispatcher("/WEB-INF/page5.jsp").forward(request, response);
         }
     }
 
