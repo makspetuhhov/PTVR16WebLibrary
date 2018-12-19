@@ -1,24 +1,25 @@
 <%-- 
-    Document   : page3
-    Created on : Dec 10, 2018, 11:03:45 AM
+    Document   : page2
+    Created on : Dec 10, 2018, 10:36:56 AM
     Author     : Melnikov
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page3</title>
+        <title>Библиотека</title>
     </head>
     <body>
-        <h1>Page3</h1>
+        <h1>Список книг</h1>
         ${info}<br>
         <a href="index.html">Главная страница</a><br>
         <ul>
-            <c:forEach var="reader" items="${listReaders}">
-                <li>${reader.name}, ${reader.surname}, ${reader.code}
+            <c:forEach var="book" items="${listBooks}">
+                <li>${book.name}, ${book.author}, ${book.isbn}
             </c:forEach>
         </ul>
     </body>

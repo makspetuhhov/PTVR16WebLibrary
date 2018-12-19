@@ -14,19 +14,35 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import javax.ejb.EJB;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import session.BookFacade;
+import session.HistoryFacade;
+import session.ReaderFacade;
 
 /**
  *
  * @author Melnikov
  */
-@WebServlet(name = "MyServlet", urlPatterns = {"/page2","/page3","/page4","/giveBook"})
+@WebServlet(name = "MyServlet", urlPatterns = {
+    "/showListBooks",
+    "/showListReaders",
+    "/showPageForGiveBook",
+    "/giveBook",
+    "/showAddNewBook",
+    "/addNewBook",
+    "/showAddNewReader",
+    "/addNewReader",
+})
 public class MyServlet extends HttpServlet {
 
+    @EJB private BookFacade bookFacade;
+    @EJB private ReaderFacade readerFacade;
+    @EJB private HistoryFacade historyFacade;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -39,45 +55,53 @@ public class MyServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        List<Book> listBooks = new ArrayList<>();
-        listBooks.add(new Book("123-123123", "Voina i mir", "L.Tolstoy"));
-        listBooks.add(new Book("123-321123", "Otsi i deti", "I.Turgenev"));
-        List<Reader> listReaders = new ArrayList<>();
-        listReaders.add(new Reader("123123", "Ivan", "Ivanov"));
-        listReaders.add(new Reader("123321", "Sidor", "Sidorov"));
+        request.setCharacterEncoding("UTF-8");
         String path = request.getServletPath();
-        if("/page2".equals(path)){
+        if("/showListBooks".equals(path)){
+            List<Book> listBooks = bookFacade.findAll();
             request.setAttribute("listBooks", listBooks);
-            request.setAttribute("info", "page2,привет из сервлета!");
-            request.getRequestDispatcher("/WEB-INF/page2.jsp").forward(request, response);
-        }else if("/page3".equals(path)){
+            request.setAttribute("info", "showListBooks,привет из сервлета!");
+            request.getRequestDispatcher("/WEB-INF/showListBooks.jsp").forward(request, response);
+        }else if("/showListReaders".equals(path)){
+            List<Reader> listReaders = readerFacade.findAll();
             request.setAttribute("listReaders", listReaders);
-            request.setAttribute("info", "page3,привет из сервлета!");
-            request.getRequestDispatcher("/WEB-INF/page3.jsp").forward(request, response);
-        }else if("/page4".equals(path)){
+            request.setAttribute("info", "showListReaders,привет из сервлета!");
+            request.getRequestDispatcher("/WEB-INF/showListReaders.jsp").forward(request, response);
+        }else if("/showPageForGiveBook".equals(path)){
+            List<Book> listBooks = bookFacade.findAll();
+            List<Reader> listReaders = readerFacade.findAll();
             request.setAttribute("listBooks", listBooks);
             request.setAttribute("listReaders", listReaders);
-            request.getRequestDispatcher("/WEB-INF/page4.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/showPageForGiveBook.jsp").forward(request, response);
         }else if("/giveBook".equals(path)){
-            String book = request.getParameter("book");
-            String reader = request.getParameter("reader");
-            Book giveBook = new Book(); 
-            for(int i=0; i<listBooks.size();i++){
-                if(listBooks.get(i).getIsbn().equals(book)){
-                    giveBook=listBooks.get(i);
-                    break;
-                }
-            }
-            Reader takeReader = new Reader();
-            for(int i=0;i<listReaders.size();i++){
-                if(listReaders.get(i).getCode().equals(reader)){
-                    takeReader = listReaders.get(i);
-                    break;
-                }
-            }Calendar c = new GregorianCalendar();
-            History history = new History(giveBook, takeReader, c.getTime());
-            request.setAttribute("history", history);
-            request.getRequestDispatcher("/WEB-INF/page5.jsp").forward(request, response);
+            String bookId = request.getParameter("bookId");
+            String readerId = request.getParameter("readerId");
+            Book book = bookFacade.find(new Long(bookId));
+            Reader reader = readerFacade.find(new Long(readerId));
+            Calendar c = new GregorianCalendar();
+            History history = new History(book, reader, c.getTime());
+            historyFacade.create(history);
+            request.getRequestDispatcher("/index.jsp").forward(request, response);
+        }else if("/showAddNewBook".equals(path)){
+            request.getRequestDispatcher("/WEB-INF/showAddNewBook.jsp").forward(request, response);
+        }else if("/addNewBook".equals(path)){
+            String name = request.getParameter("name");
+            String author = request.getParameter("author");
+            String isbn = request.getParameter("isbn");
+            Book book = new Book(isbn, name, author);
+            bookFacade.create(book);
+            request.setAttribute("info", "Книга \""+book.getName()+"\"добавлена");
+            request.getRequestDispatcher("/index.html").forward(request, response);
+        }else if("/showAddNewReader".equals(path)){
+            request.getRequestDispatcher("/WEB-INF/showAddNewReader.jsp").forward(request, response);
+        }else if("/addNewReader".equals(path)){
+            String name = request.getParameter("name");
+            String surname = request.getParameter("surname");
+            String code = request.getParameter("code");
+            Reader reader = new Reader(code, name, surname);
+            readerFacade.create(reader);
+            request.setAttribute("info", "Читатель \""+reader.getSurname()+"\"добавлен");
+            request.getRequestDispatcher("/index.html").forward(request, response);
         }
     }
 

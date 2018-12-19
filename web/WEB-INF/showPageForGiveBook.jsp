@@ -10,21 +10,21 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page4</title>
+        <title>Библиотека</title>
     </head>
     <body>
-        <h1>Page4</h1>
+        <h1>Выдать книгу читателю</h1>
         ${info}<br>
         <a href="index.html">Главная страница</a><br>
         <form action="giveBook" method="POST">
-            <select name="book">
+            <select name="bookId">
                 <c:forEach var="bookItem" items="${listBooks}">
-                    <option value="${bookItem.isbn}">${bookItem.name}</option>
+                    <option value="${bookItem.id}">${bookItem.name}</option>
                 </c:forEach>
             </select>
-            <select name="reader">
+            <select name="readerId">
                 <c:forEach var="readerItem" items="${listReaders}">
-                    <option value="${readerItem.code}">${readerItem.name} ${readerItem.surname}</option>
+                    <option value="${readerItem.id}">${readerItem.name} ${readerItem.surname}</option>
                 </c:forEach>
             </select>
             <input type="submit" value="Выдать книгу">

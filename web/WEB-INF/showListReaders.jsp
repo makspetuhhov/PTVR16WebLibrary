@@ -10,14 +10,16 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page5</title>
+        <title>Библиотека</title>
     </head>
     <body>
-        <h1>Page5</h1>
+        <h1>Список читателей</h1>
         ${info}<br>
         <a href="index.html">Главная страница</a><br>
         <ul>
-            <li>${history.reader.name} ${history.reader.surname} взял книгу ${history.book.name}</li>
+            <c:forEach var="reader" items="${listReaders}">
+                <li>${reader.name}, ${reader.surname}, ${reader.code}
+            </c:forEach>
         </ul>
     </body>
 </html>
