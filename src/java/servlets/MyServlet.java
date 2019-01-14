@@ -32,11 +32,13 @@ import session.ReaderFacade;
     "/showListBooks",
     "/showListReaders",
     "/showPageForGiveBook",
+    "/showPageForReturnBook",
     "/giveBook",
     "/showAddNewBook",
     "/addNewBook",
     "/showAddNewReader",
     "/addNewReader",
+    "/returnBook",
 })
 public class MyServlet extends HttpServlet {
 
@@ -56,6 +58,7 @@ public class MyServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
+        Calendar c = new GregorianCalendar();
         String path = request.getServletPath();
         if("/showListBooks".equals(path)){
             List<Book> listBooks = bookFacade.findAll();
@@ -78,9 +81,15 @@ public class MyServlet extends HttpServlet {
             String readerId = request.getParameter("readerId");
             Book book = bookFacade.find(new Long(bookId));
             Reader reader = readerFacade.find(new Long(readerId));
-            Calendar c = new GregorianCalendar();
-            History history = new History(book, reader, c.getTime());
-            historyFacade.create(history);
+            if(book.getCount()>0){
+                book.setCount(book.getCount()-1);
+                bookFacade.edit(book);
+                History history = new History(book, reader, c.getTime());
+                historyFacade.create(history);
+                request.setAttribute("info", "Книга " + book.getName() + " выдана");
+            }else{
+                request.setAttribute("info", "Все книги выданы");
+            }
             request.getRequestDispatcher("/index.jsp").forward(request, response);
         }else if("/showAddNewBook".equals(path)){
             request.getRequestDispatcher("/WEB-INF/showAddNewBook.jsp").forward(request, response);
@@ -88,10 +97,11 @@ public class MyServlet extends HttpServlet {
             String name = request.getParameter("name");
             String author = request.getParameter("author");
             String isbn = request.getParameter("isbn");
-            Book book = new Book(isbn, name, author);
+            String count = request.getParameter("count");
+            Book book = new Book(isbn, name, author, new Integer(count));
             bookFacade.create(book);
             request.setAttribute("info", "Книга \""+book.getName()+"\"добавлена");
-            request.getRequestDispatcher("/index.html").forward(request, response);
+            request.getRequestDispatcher("/index.jsp").forward(request, response);
         }else if("/showAddNewReader".equals(path)){
             request.getRequestDispatcher("/WEB-INF/showAddNewReader.jsp").forward(request, response);
         }else if("/addNewReader".equals(path)){
@@ -101,7 +111,32 @@ public class MyServlet extends HttpServlet {
             Reader reader = new Reader(code, name, surname);
             readerFacade.create(reader);
             request.setAttribute("info", "Читатель \""+reader.getSurname()+"\"добавлен");
-            request.getRequestDispatcher("/index.html").forward(request, response);
+            request.getRequestDispatcher("/index.jsp").forward(request, response);
+        }else if("/showPageForReturnBook".equals(path)){
+            List<History> listHistories = historyFacade.findGivenBooks();
+            request.setAttribute("listHistories", listHistories);
+            request.getRequestDispatcher("/WEB-INF/showReturnBook.jsp").forward(request, response);
+        }else if("/returnBook".equals(path)){
+            String historyId = request.getParameter("returnHistoryId");
+            History history = historyFacade.find(new Long(historyId));
+            if(history == null){
+                request.setAttribute("info", "Такой книги не выдавалось");
+                request.getRequestDispatcher("/index.jsp").forward(request, response);
+                return;
+            }
+            
+            Book book = history.getBook();
+            if(book.getQuantity()>book.getCount()){
+                book.setCount(book.getCount()+1);
+                bookFacade.edit(book);
+                history.setDateEnd(c.getTime());
+                historyFacade.edit(history);
+                request.setAttribute("info", "Книга "+book.getName()+" возвращена");
+            }else{
+                request.setAttribute("info", "Все книги уже возвращены"); 
+            }
+            
+            request.getRequestDispatcher("/index.jsp").forward(request, response);
         }
     }
 

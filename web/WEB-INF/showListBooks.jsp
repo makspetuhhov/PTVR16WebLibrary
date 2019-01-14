@@ -16,7 +16,7 @@
     <body>
         <h1>Список книг</h1>
         ${info}<br>
-        <a href="index.html">Главная страница</a><br>
+        <a href="index.jsp">Главная страница</a><br>
         <ul>
             <c:forEach var="book" items="${listBooks}">
                 <li>${book.name}, ${book.author}, ${book.isbn}

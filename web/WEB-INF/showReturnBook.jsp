@@ -16,15 +16,16 @@
         <h1>Добавить книгу/h1>
         ${info}<br>
         <a href="index.jsp">Главная страница</a><br>
-        <form action="addNewReader" method="POST">
-            Имя:<br>
-            <input type="text" name="name"><br>
-            Фамилия:<br>
-            <input type="text" name="surname"><br>
-            Личный номер:<br>
-            <input type="text" name="code"><br>
+        <form action="returnBook" method="POST">
+            <ul>
+                <c:forEach var="historyItem" items="${listHistories}">
+                    <li>${historyItem.id}. ${historyItem.reader.name} ${historyItem.reader.surname} читает книгу ${historyItem.book.name}</li>
+                </c:forEach>
+            </ul>
             <br>
-            <input type="submit" value="Добавить книгу">
+            Номер позиции возврата:<br>
+            <input type="text" name="returnHistoryId">
+            <input type="submit" value="Вернуть книгу">
         </form>
     </body>
 </html>
