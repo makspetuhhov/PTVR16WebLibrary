@@ -14,8 +14,8 @@
     <body>
         <H1>Добро пожаловать в нашу библиотеку</H1>
         ${info}<br>
-        <a href="page1.jsp">Page1</a><br>
         <a href="showListBooks">Список книг</a><br>
+        Для библиотекаря<br>
         <a href="showListReaders">Список читателей</a><br>
         <a href="showPageForGiveBook">Выдать книгу</a><br>
         <a href="showPageForReturnBook">Вернуть книгу</a><br>
