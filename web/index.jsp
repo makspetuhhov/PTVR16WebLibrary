@@ -15,6 +15,7 @@
         <H1>Добро пожаловать в нашу библиотеку</H1>
         ${info}<br>
         <a href="showListBooks">Список книг</a><br>
+        <a href="showRegistration">Зарегистрироваться</a><br>
         Для библиотекаря<br>
         <a href="showListReaders">Список читателей</a><br>
         <a href="showPageForGiveBook">Выдать книгу</a><br>

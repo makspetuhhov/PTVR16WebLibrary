@@ -5,9 +5,9 @@
  */
 package servlets;
 
+import entity.Reader;
 import entity.User;
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.ejb.EJB;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import session.ReaderFacade;
 import session.UserFacade;
 
 /**
@@ -24,10 +25,13 @@ import session.UserFacade;
 @WebServlet(name = "SecutityServlet", urlPatterns = {
     "/showLogin",
     "/login",
+    "/showRegistration",
+    "/registration",
 
 })
 public class SecurityServlet extends HttpServlet {
     @EJB private UserFacade userFacade;
+    @EJB private ReaderFacade readerFacade;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -41,6 +45,7 @@ public class SecurityServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
+        HttpSession session = null;
         String path = request.getServletPath();
         if(path != null)
             switch (path) {
@@ -59,11 +64,32 @@ public class SecurityServlet extends HttpServlet {
                         request.setAttribute("info", "Неправильный логин или пароль!");
                         request.getRequestDispatcher("/showLogin.jsp").forward(request, response);
                     }
-                    HttpSession session = request.getSession(true);
+                    session = request.getSession(true);
                     session.setAttribute("regUser", regUser);
                     request.setAttribute("info", "Вы вошли!");
                         request.getRequestDispatcher("/index.jsp").forward(request, response);
                     break;
+                case "/showRegistration":
+                    request.getRequestDispatcher("/showRegistration.jsp").forward(request, response);
+                    break;
+                case "/registration":
+                    String name = request.getParameter("name");
+                    String surname = request.getParameter("surname");
+                    String email = request.getParameter("email");
+                    login = request.getParameter("login");
+                    String password1 = request.getParameter("password1");
+                    String password2 = request.getParameter("password2");
+                    if(!password1.equals(password2)){
+                        request.setAttribute("info", "Несовпадает пароль!");
+                        request.getRequestDispatcher("/showRegistration.jsp").forward(request, response);
+                    }
+                    Reader reader = new Reader(email, name, surname);
+                    readerFacade.create(reader);
+                    User user = new User(login, password1, true, reader);
+                    userFacade.create(user);
+                    request.setAttribute("info", "Регистрация успешна!");
+                    request.getRequestDispatcher("/index.jsp").forward(request, response);
+                    break;    
             }
         
     }

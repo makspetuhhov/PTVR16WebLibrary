@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,15 +21,16 @@ public class Reader  implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String code;
+    @Column(unique = true)
+    private String email;
     private String name;
     private String surname;
 
     public Reader() {
     }
 
-    public Reader(String code, String name, String surname) {
-        this.code = code;
+    public Reader(String email, String name, String surname) {
+        this.email = email;
         this.name = name;
         this.surname = surname;
     }
@@ -41,12 +43,12 @@ public class Reader  implements Serializable{
         this.id = id;
     }
 
-    public String getCode() {
-        return code;
+    public String getEmail() {
+        return email;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getName() {
@@ -67,7 +69,7 @@ public class Reader  implements Serializable{
 
     @Override
     public String toString() {
-        return "Reader{" + "code=" + code + ", name=" + name + ", surname=" + surname + '}';
+        return "Reader{" + "email=" + email + ", name=" + name + ", surname=" + surname + '}';
     }
     
     
